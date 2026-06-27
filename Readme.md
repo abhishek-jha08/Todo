@@ -43,12 +43,3 @@ cd Todo
 
 ## ✍️ Contributing
 Contributions are welcome! Open an issue or submit a pull request with improvements.
-
-## 📄 License
-Specify a license here (e.g., MIT) or add a LICENSE file to the repo.
-
----
-
-Notes:
-- I removed stray characters and fixed formatting for readability.
-- If you want, I can rename this file to the conventional `README.md` and add screenshots or live demo links.
