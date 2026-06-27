@@ -2,91 +2,149 @@
 const taskInput = document.getElementById('taskInput');
 const addBtn = document.getElementById('addBtn');
 const taskList = document.getElementById('taskList');
+const filterBtns = document.querySelectorAll('.filter-btn');
+const taskCount = document.getElementById('taskCount');
+const clearCompletedBtn = document.getElementById('clearCompleted');
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = themeToggle.querySelector('i');
 
-// Load tasks from local storage when the page loads
-document.addEventListener('DOMContentLoaded', loadTasks);
+// State variables
+let tasks = JSON.parse(localStorage.getItem('todoTasks')) || [];
+let currentFilter = 'all';
 
-// Event listener for adding a task via button click
+// Initialize
+document.addEventListener('DOMContentLoaded', renderTasks);
+
+// Event Listeners
 addBtn.addEventListener('click', addTask);
+taskInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addTask();
+});
+clearCompletedBtn.addEventListener('click', clearCompleted);
 
-// Event listener for adding a task via 'Enter' key
-taskInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        addTask();
-    }
+filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        // Update active class on buttons
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        // Set current filter and re-render
+        currentFilter = btn.getAttribute('data-filter');
+        renderTasks();
+    });
 });
 
-// Function to add a new task
+// Functions
 function addTask() {
-    const taskText = taskInput.value.trim();
-    
-    if (taskText === '') {
-        alert('Please enter a task!');
-        return;
-    }
+    const text = taskInput.value.trim();
+    if (!text) return alert('Please enter a task!');
 
-    // Create list item
-    const li = document.createElement('li');
-    
-    // Create span for text (makes it easier to click and toggle)
-    const span = document.createElement('span');
-    span.classList.add('task-text');
-    span.textContent = taskText;
-    
-    // Toggle completion when clicking the text
-    span.addEventListener('click', function() {
-        li.classList.toggle('completed');
-        saveData();
-    });
+    const newTask = {
+        id: Date.now(), // Unique ID based on timestamp
+        text: text,
+        completed: false
+    };
 
-    // Create delete button
-    const deleteBtn = document.createElement('button');
-    deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
-    deleteBtn.classList.add('delete-btn');
-    
-    // Delete task event
-    deleteBtn.addEventListener('click', function() {
-        li.remove();
-        saveData();
-    });
-
-    // Append elements
-    li.appendChild(span);
-    li.appendChild(deleteBtn);
-    taskList.appendChild(li);
-
-    // Clear input and save
+    tasks.push(newTask);
     taskInput.value = '';
-    saveData();
+    saveAndRender();
 }
 
-// Function to save tasks to localStorage
-function saveData() {
-    // We can save the innerHTML of the task list container
-    localStorage.setItem('todoList', taskList.innerHTML);
+function toggleTask(id) {
+    tasks = tasks.map(task => 
+        task.id === id ? { ...task, completed: !task.completed } : task
+    );
+    saveAndRender();
 }
 
-// Function to load tasks from localStorage
-function loadTasks() {
-    const savedData = localStorage.getItem('todoList');
-    if (savedData) {
-        taskList.innerHTML = savedData;
-        
-        // Re-attach event listeners to loaded items
-        const listItems = taskList.querySelectorAll('li');
-        listItems.forEach(li => {
-            const span = li.querySelector('.task-text');
-            const deleteBtn = li.querySelector('.delete-btn');
-            
-            span.addEventListener('click', function() {
-                li.classList.toggle('completed');
-                saveData();
-            });
-            
-            deleteBtn.addEventListener('click', function() {
-                li.remove();
-                saveData();
-            });
-        });
+function deleteTask(id) {
+    tasks = tasks.filter(task => task.id !== id);
+    saveAndRender();
+}
+
+function editTask(id, oldText) {
+    const newText = prompt("Edit your task:", oldText);
+    if (newText !== null && newText.trim() !== "") {
+        tasks = tasks.map(task => 
+            task.id === id ? { ...task, text: newText.trim() } : task
+        );
+        saveAndRender();
     }
 }
+
+function clearCompleted() {
+    tasks = tasks.filter(task => !task.completed);
+    saveAndRender();
+}
+
+function saveAndRender() {
+    localStorage.setItem('todoTasks', JSON.stringify(tasks));
+    renderTasks();
+}
+
+function renderTasks() {
+    taskList.innerHTML = ''; // Clear current list
+
+    // Filter tasks based on selection
+    let filteredTasks = tasks;
+    if (currentFilter === 'active') {
+        filteredTasks = tasks.filter(task => !task.completed);
+    } else if (currentFilter === 'completed') {
+        filteredTasks = tasks.filter(task => task.completed);
+    }
+
+    // Update active task count
+    const activeTasksCount = tasks.filter(task => !task.completed).length;
+    taskCount.textContent = `${activeTasksCount} item${activeTasksCount !== 1 ? 's' : ''} left`;
+
+    // Create DOM elements for filtered tasks
+    filteredTasks.forEach(task => {
+        const li = document.createElement('li');
+        if (task.completed) li.classList.add('completed');
+
+        const span = document.createElement('span');
+        span.classList.add('task-text');
+        span.textContent = task.text;
+        span.addEventListener('click', () => toggleTask(task.id));
+
+        const actionButtons = document.createElement('div');
+        actionButtons.classList.add('action-buttons');
+
+        const editBtn = document.createElement('button');
+        editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+        editBtn.classList.add('edit-btn');
+        editBtn.addEventListener('click', () => editTask(task.id, task.text));
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+        deleteBtn.classList.add('delete-btn');
+        deleteBtn.addEventListener('click', () => deleteTask(task.id));
+
+        actionButtons.appendChild(editBtn);
+        actionButtons.appendChild(deleteBtn);
+        li.appendChild(span);
+        li.appendChild(actionButtons);
+        taskList.appendChild(li);
+    });
+}
+
+// --- NEW: Theme Toggle Logic ---
+// Check if they previously enabled dark mode
+const savedTheme = localStorage.getItem('todoTheme');
+if (savedTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+    themeIcon.classList.replace('fa-moon', 'fa-sun');
+}
+
+// Listen for clicks on the toggle button
+themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    
+    // Check if dark mode is now active and update icon/storage
+    if (document.body.classList.contains('dark-mode')) {
+        themeIcon.classList.replace('fa-moon', 'fa-sun');
+        localStorage.setItem('todoTheme', 'dark');
+    } else {
+        themeIcon.classList.replace('fa-sun', 'fa-moon');
+        localStorage.setItem('todoTheme', 'light');
+    }
+});

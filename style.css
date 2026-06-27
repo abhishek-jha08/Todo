@@ -110,4 +110,252 @@ li.completed {
 
 .delete-btn:hover {
     background: #e04343;
+}/* Add animation for new items */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+li {
+    /* Keep your existing li styles, just add this animation property */
+    animation: slideIn 0.3s ease-out forwards;
+}
+
+/* Style for the new Edit button */
+.edit-btn {
+    background: #ffa726;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: background 0.3s;
+}
+
+.edit-btn:hover {
+    background: #fb8c00;
+}
+
+/* Group buttons together */
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+/* --- NEW STYLES --- */
+.filters {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-btn {
+    background: none;
+    border: 2px solid transparent;
+    color: #666;
+    padding: 5px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+    color: #667eea;
+}
+
+.filter-btn.active {
+    border-color: #667eea;
+    color: #667eea;
+    font-weight: bold;
+}
+
+.list-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    font-size: 0.9rem;
+    color: #888;
+}
+
+#clearCompleted {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+#clearCompleted:hover {
+    color: #ff5252;
+    text-decoration: underline;
+}
+
+/* Animations for adding/removing items */
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+li {
+    animation: slideIn 0.3s ease-out forwards;
+}
+
+/* Edit button styling */
+.edit-btn {
+    background: #ffa726;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: background 0.3s;
+}
+
+.edit-btn:hover {
+    background: #fb8c00;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+
+/* --- DARK MODE STYLES --- */
+
+/* Fix header layout so title and button are on the same line */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    margin-bottom: 0; /* Removes the old bottom margin */
+}
+
+/* Theme Button Styling */
+.theme-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+/* The Dark Mode Overrides */
+body.dark-mode {
+    background: linear-gradient(135deg, #121212 0%, #2d2d2d 100%);
+}
+
+body.dark-mode .container {
+    background: #1e1e1e;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode header h1,
+body.dark-mode .theme-btn {
+    color: #f1f1f1;
+}
+
+body.dark-mode #taskInput {
+    background: #2d2d2d;
+    color: #f1f1f1;
+    border-color: #444;
+}
+
+body.dark-mode #taskInput::placeholder {
+    color: #aaa;
+}
+
+body.dark-mode li {
+    background: #2d2d2d;
+    color: #f1f1f1;
+}
+
+body.dark-mode li:hover {
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode li.completed {
+    background: #252525;
+    color: #777;
+}
+
+body.dark-mode .filter-btn {
+    color: #aaa;
+}
+
+body.dark-mode .filter-btn:hover,
+body.dark-mode .filter-btn.active {
+    color: #667eea;
+}
+
+body.dark-mode .list-footer {
+    border-top-color: #333;
+    color: #aaa;
+}
+
+/* --- RESPONSIVE DESIGN (MOBILE SCREENS) --- */
+@media (max-width: 480px) {
+    body {
+        padding: 10px; /* Less outer padding on small screens */
+    }
+
+    .container {
+        padding: 20px 15px; /* Thinner inner padding to give content more room */
+    }
+
+    header h1 {
+        font-size: 1.5rem; /* Slightly smaller title */
+    }
+
+    #taskInput {
+        padding: 10px; /* Slimmer input field */
+    }
+
+    #addBtn {
+        padding: 10px 15px;
+    }
+
+    .filters {
+        flex-wrap: wrap; /* Allows filter buttons to drop to a new line if needed */
+        gap: 5px;
+    }
+
+    .filter-btn {
+        padding: 5px 8px;
+        font-size: 0.85rem;
+    }
+
+    .action-buttons {
+        flex-direction: column; /* Stack the edit and delete buttons vertically */
+        gap: 3px;
+    }
+
+    .edit-btn, .delete-btn {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+
+    .list-footer {
+        flex-direction: column; /* Stack the "items left" and "Clear Completed" button */
+        gap: 12px;
+        text-align: center;
+    }
 }
